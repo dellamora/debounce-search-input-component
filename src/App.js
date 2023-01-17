@@ -1,23 +1,24 @@
 import "./App.css";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import SearchInput from "./components/SearchInput";
+import { getAnimeInfos } from "./services/api";
+
 export default function App() {
   const [info, setInfo] = useState({});
   const [text, setText] = useState("");
 
+  const fetchAnimeInfos = useCallback(async () => {
+    setInfo({});
+    const response = await getAnimeInfos(text);
+    const data = await response.json();
+    setInfo(data);
+  }, [text]);
+
   useEffect(() => {
     if (text) {
-      setInfo({});
-      fetch(
-        `https://kitsu.io/api/edge/anime?filter[text]=${text}&page[limit]=20`
-      )
-        .then((response) => response.json())
-        .then((response) => {
-          console.log(response);
-          setInfo(response);
-        });
+      fetchAnimeInfos();
     }
-  }, [text]);
+  }, [text, fetchAnimeInfos]);
 
   return (
     <div className="App">
